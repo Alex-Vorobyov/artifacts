@@ -16,7 +16,7 @@ import { webcrypto } from 'node:crypto';
 const crypto = webcrypto;
 const ITER = 600000;
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const SEEDS = process.env.SEEDS || path.join(os.homedir(), '.hermes', 'cache', 'scratch', 'seeds');
+const SEEDS = process.env.SEEDS || path.join(os.homedir(), '.hermes', 'seeds');
 const TARGETS = [
   { slug: 'vietnam', seed: 'seed_vietnam.json', vault: 'tools/vault_vietnam.json' },
   { slug: 'iis-3',   seed: 'seed_iis3.json',   vault: 'tools/vault_iis3.json' },
