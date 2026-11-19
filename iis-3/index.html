@@ -261,8 +261,7 @@ function vaultGate(VAULT, cfg, onOpen){
   const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
   const b64e=b=>btoa(String.fromCharCode.apply(null,new Uint8Array(b)));
   const enc=new TextEncoder();
-  const TTL=cfg.ttl||30*24*3600*1000;
-  const saved=()=>{ try{ const s=JSON.parse(localStorage.getItem(cfg.store)||"null"); return (s&&s.exp>Date.now())?s:null; }catch(e){ return null; } };
+  const saved=()=>{ try{ const s=JSON.parse(localStorage.getItem(cfg.store)||"null"); return (s&&s.k)?s:null; }catch(e){ return null; } };
   const forget=()=>{ try{ localStorage.removeItem(cfg.store); }catch(e){} };
   async function keyFromPass(pass){
     const base=await crypto.subtle.importKey("raw",enc.encode(pass),"PBKDF2",false,["deriveKey"]);
@@ -321,7 +320,7 @@ function vaultGate(VAULT, cfg, onOpen){
         const key=await keyFromPass(pass);
         const data=await openKey(key);
         const raw=await crypto.subtle.exportKey("raw",key);
-        try{ localStorage.setItem(cfg.store,JSON.stringify({k:b64e(raw),exp:Date.now()+TTL})); }catch(e){}
+        try{ localStorage.setItem(cfg.store,JSON.stringify({k:b64e(raw)})); }catch(e){}
         ov.remove(); onOpen(data);
       }catch(e){
         err.textContent=cfg.wrong||"Не подходит. Проверь фразу.";
@@ -731,7 +730,7 @@ const db={ doc:path=>({
   async update(patch){ store[path]=Object.assign({}, store[path], deep(patch)); persist(); emit(path); }
 })};
 vaultGate(VAULT,{store:"iis3-unlock-v1",title:"Портфель закрыт",sub:"Введи пароль-фразу, чтобы открыть табло ИИС-3.",
-  note:"Запоминается на 30 дней на этом устройстве",bg:"#0B0B0C",surface:"#18181B",line:"#2A2A2F",fg:"#F4F4F5",
+  note:"Запоминается на этом устройстве",bg:"#0B0B0C",surface:"#18181B",line:"#2A2A2F",fg:"#F4F4F5",
   muted:"#8C8C94",accent:"#6E9BFF",accentInk:"#0A1023",err:"#F0605A",fieldBg:"#222226",font:"'Golos Text',system-ui,sans-serif"},
   data=>{
     SEED=data;
