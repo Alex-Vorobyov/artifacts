@@ -1,0 +1,749 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<meta name="robots" content="noindex, nofollow">
+<title>Пенсия ИИС-3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: dark brokerage-app screen — balance-style hero, quote tile, grouped holding rows with monogram badges, monthly history, sticky action dock. Single dark look by choice. */
+:root{
+  --bg:#0B0B0C; --surface:#18181B; --raised:#222226; --ink:#F4F4F5; --muted:#8C8C94; --line:#2A2A2F;
+  --accent:#6E9BFF; --accent-ink:#0A1023; --accent-soft:#18213A; --down:#F0605A; --warn:#F2B14C;
+  --body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:18px; color-scheme:dark;
+  --tfs:15px; --tlogo:28px; --tlr:8px; --tgap:10px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.35;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:960px;margin:0 auto;padding-block:20px 132px;display:grid;gap:22px}
+.wrap>*,#app>*{min-width:0}
+#app{display:grid;gap:22px;min-width:0}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.muted{color:var(--muted)}
+
+/* top */
+.top .acc{font-size:14px;color:var(--muted);white-space:nowrap}
+h1{font-size:22px;font-weight:600;margin:0;letter-spacing:-.01em}
+.hero{display:grid;gap:6px}
+.hero label{font-size:14px;color:var(--muted)}
+.amount{display:flex;align-items:baseline;gap:4px}
+.amount input{font:inherit;font-size:38px;font-weight:600;letter-spacing:-.02em;color:var(--ink);background:transparent;border:0;padding:0;
+  font-variant-numeric:tabular-nums;max-width:100%;border-bottom:2px dashed var(--line);padding-bottom:2px}
+.amount input:focus{outline:none;border-bottom:2px solid var(--accent)}
+.amount .cur{font-size:38px;font-weight:600;color:var(--muted)}
+.heroline{font-size:14px;color:var(--accent)}
+.heroline .muted{color:var(--muted)}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--surface);border-radius:16px;padding:14px 12px;display:grid;gap:6px;min-width:0;border:0;color:var(--ink);text-align:left;font:inherit}
+.tile small{font-size:12.5px;color:var(--muted)}
+.tile b{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button.tile{cursor:pointer}
+button.tile b{color:var(--accent)}
+button.tile:disabled{opacity:.6;cursor:default}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.ttl{display:grid;gap:4px;min-width:0}
+.qbox{display:grid;justify-items:end;gap:6px;text-align:right;max-width:58%}
+.qbox .qt{font-size:12px;color:var(--muted);line-height:1.3}
+button.qbtn{padding:7px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13.5px}
+.qline{font-size:11.5px;color:var(--muted);line-height:1.3}
+.qline.err{color:var(--warn)}
+
+/* sections */
+.sec{display:grid;gap:4px}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 2px 8px}
+.sechead h2{font-size:18px;font-weight:600;margin:0;display:flex;align-items:baseline;gap:8px}
+.sechead h2 small{font-size:13px;font-weight:400;color:var(--muted)}
+.sechead .r{font-size:15px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* rows */
+.row{display:grid;grid-template-columns:40px minmax(0,1fr) 5.4ch auto 26px;gap:12px;align-items:center;padding:12px 0}
+.row[data-t]{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.row[data-t] input.price{user-select:text}
+.row.done .nm,.row.done .rt{opacity:.45}
+.row .badge{transition:filter .2s,opacity .2s}
+.row.done .badge{filter:grayscale(1);opacity:.45}
+.row.done .rt b,.row.done .nm{text-decoration:line-through}
+.ck{display:grid;place-items:center;cursor:pointer}
+.ck input{appearance:none;-webkit-appearance:none;width:24px;height:24px;margin:0;border-radius:7px;border:2px solid #4A4A52;background:transparent;cursor:pointer;display:grid;place-items:center;transition:background .15s,border-color .15s}
+.ck input:checked{background:var(--accent);border-color:var(--accent)}
+.ck input:checked::after{content:"";width:6px;height:11px;border:solid var(--accent-ink);border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+.ck input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.badge{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;font-size:12px;font-weight:700;letter-spacing:.02em;color:#0B0B0C;overflow:hidden;flex:none}
+.badge img{width:100%;height:100%;object-fit:cover;display:block}
+.badge.s{width:22px;height:22px;font-size:8px;border-radius:6px}
+.nmc{display:inline-flex;align-items:center;gap:8px}
+.mid{min-width:0;display:grid;gap:3px}
+.nm{font-size:15.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;white-space:nowrap;min-width:0}
+.sub input{font:inherit;color:var(--muted);background:transparent;border:0;border-bottom:1px dashed var(--line);padding:0;width:auto;font-variant-numeric:tabular-nums}
+.sub input:focus{outline:none;color:var(--ink);border-bottom:1px solid var(--accent)}
+.rt{text-align:right;display:grid;gap:3px}
+.rt b{font-size:15.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rt span{font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.plus{color:var(--accent)}
+.skip{color:var(--muted)}
+.over{color:var(--down)}
+.divtag{grid-column:2/-1;font-size:12.5px;color:var(--accent);background:var(--accent-soft);border-radius:10px;padding:6px 10px;margin-top:-4px}
+
+/* cards */
+.card{background:var(--surface);border-radius:var(--r);padding:16px}
+.divbtn{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:0;color:var(--ink);font:inherit;font-weight:500;cursor:pointer;padding:0;border-radius:0}
+.divbtn span:last-child{color:var(--muted);font-weight:400;font-size:14px}
+.divgrid{display:grid;margin-top:10px}
+.divgrid label{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;min-width:0}
+.divgrid label span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.divgrid input{width:110px;text-align:right;font:inherit;font-variant-numeric:tabular-nums;background:var(--raised);color:var(--ink);border:0;border-radius:10px;padding:8px 10px}
+.divgrid input:focus{outline:2px solid var(--accent)}
+
+/* history */
+.month{border-top:1px solid var(--line)}
+.month:first-child{border-top:0}
+.month summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:18px 0}
+.month summary::-webkit-details-marker{display:none}
+.month .mn{font-size:16px;font-weight:500}
+.month .ms{font-size:13.5px;color:var(--muted);grid-column:1}
+.month .mr{grid-column:2;grid-row:1/3;text-align:right;align-self:center}
+.month .mr b{display:block;font-size:16px;font-weight:600}
+.month .mr span{font-size:13px;color:var(--muted)}
+.mbody{display:grid;padding:2px 0 18px}
+.mline{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;font-size:13.5px;padding:6px 0;align-items:center}
+.mline .q{color:var(--muted)}
+.more{background:none;border:0;color:var(--accent);font:inherit;font-weight:500;padding:10px 0;cursor:pointer;border-radius:0}
+
+/* positions */
+details.card summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;font-weight:500}
+details.card summary::-webkit-details-marker{display:none}
+details.card summary::after{content:"Показать";color:var(--muted);font-weight:400;font-size:14px}
+details.card[open] summary::after{content:"Скрыть"}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:var(--tfs)}
+th,td{padding:11px 8px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td{border-bottom:1px solid var(--line)}
+tbody tr:last-child td{border-bottom:0}
+th{font-size:12.5px;color:var(--muted);font-weight:400;padding-block:6px 10px}
+th:first-child,td:first-child{text-align:left;padding-left:0;position:sticky;left:0;background:var(--surface);z-index:1}
+th:last-child,td:last-child{padding-right:0}
+td .nmc{display:flex;align-items:center;gap:var(--tgap)}
+td .badge.s,.bline .badge.s,.cobar .badge.s{width:var(--tlogo);height:var(--tlogo);border-radius:var(--tlr)}
+
+/* dividends tab */
+.drow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.drow:first-child{border-top:0}
+.drow .sub{white-space:normal}
+.drow input{width:110px;text-align:right;font:inherit;font-variant-numeric:tabular-nums;background:var(--raised);color:var(--ink);border:0;border-radius:10px;padding:9px 10px}
+.drow input:focus{outline:2px solid var(--accent)}
+@media (max-width:400px){.drow input{width:92px}}
+button.divnote{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;background:var(--accent-soft);color:var(--accent);border-radius:14px;padding:12px 14px;font-weight:500;font-size:14px}
+button.divnote span{color:var(--ink);font-weight:600}
+.mline .q{white-space:nowrap}
+.bline{display:grid;grid-template-columns:minmax(0,1fr) 4.4ch 6.4ch 6.6ch;gap:16px;font-variant-numeric:tabular-nums;align-items:center;font-size:var(--tfs);padding:11px 0;border-bottom:1px solid var(--line)}
+.bline:last-child{border-bottom:0}
+.bline .nmc{gap:var(--tgap)}
+.bline>span:not(:first-child){text-align:right}
+.bline.bh{font-size:12.5px;color:var(--muted);white-space:nowrap;padding:6px 0 10px}
+.bline .nmc{min-width:0;display:flex;align-items:center}
+.bline .bn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.bline .num{white-space:nowrap}
+.bline .q{color:var(--muted)}
+.bline.c3{grid-template-columns:minmax(0,1fr) auto 8ch}
+@media (max-width:400px){:root{--tfs:14px;--tlogo:24px;--tlr:7px;--tgap:8px}.bline{gap:6px}.card{padding-inline:14px}.mbody .bline .num{font-size:13.5px}}
+
+/* dividend stats */
+.ctitle{font-size:12.5px;color:var(--muted);padding:6px 0 10px}
+.cnote{font-size:12.5px;color:var(--muted);margin-top:10px}
+.mbars{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;height:150px;align-items:end}
+.mb{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px;min-width:0}
+.mb .bar{width:100%;max-width:26px;background:var(--accent);border-radius:5px 5px 2px 2px}
+.mb .mv{font-size:10.5px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mb .ml{font-size:10.5px;color:var(--muted)}
+.mb{position:relative}
+.cobar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;padding:11px 0;font-size:var(--tfs);border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.cobar:last-of-type{border-bottom:0}
+.cobar .nmc{display:flex;align-items:center;gap:var(--tgap);min-width:0}
+.cobar .track{grid-column:1;height:6px;background:var(--raised);border-radius:3px;overflow:hidden;align-self:center}
+.cobar .track span{display:block;height:100%;background:var(--accent);border-radius:3px}
+.cobar .pct{font-size:13px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.sumgrid .tile small{line-height:1.25}
+
+.bline .sold{grid-column:2/4;text-align:right}
+.tnote{font-size:13px;color:var(--muted);padding:10px 0 2px}
+.prow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.prow:last-of-type{border-bottom:0}
+.prow .rt span{color:var(--muted)}
+.bline .pn{display:grid;min-width:0;gap:1px}
+.bline .pn small,.bline .num small{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.drow .sub span{white-space:nowrap}
+.sumgrid .tile b{font-size:15px}
+@media (max-width:400px){.sumgrid{gap:8px}.sumgrid .tile{padding:12px 10px}.sumgrid .tile b{font-size:14px}.sumgrid .tile small{font-size:12px}}
+@media (max-width:400px){.mb .mv{font-size:9.5px;letter-spacing:-.02em}.mbars{gap:3px}}
+@media (max-width:350px){.sub span,.drow .sub span{white-space:normal}.drow input{width:80px}.drow{gap:10px}.prow{gap:10px}}
+.sweep{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--surface);border-radius:14px;padding:14px 16px}
+.sweep.on{background:var(--accent-soft)}
+.sweep div{display:grid;gap:4px;min-width:0}
+.sweep b{font-weight:600}
+.sweep small{font-size:13px;color:var(--muted);line-height:1.35}
+.tgl{position:relative;flex:none;width:46px;height:28px;cursor:pointer}
+.tgl input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.tgl span{pointer-events:none;position:absolute;inset:0;border-radius:14px;background:var(--raised);transition:background .15s}
+.tgl span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--ink);transition:transform .15s}
+.tgl input:checked+span{background:var(--accent)}
+.tgl input:checked+span::after{transform:translateX(18px);background:var(--accent-ink)}
+.tgl input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.sell{color:var(--warn)}
+.limit{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:var(--muted);padding:2px 0 4px}
+.limit input{font:inherit;color:var(--ink);background:transparent;border:0;border-bottom:1px dashed var(--line);padding:0;text-align:right;font-variant-numeric:tabular-nums}
+.limit input:focus{outline:none;border-bottom:1px solid var(--accent)}
+.limit span{white-space:nowrap}
+.nmline{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;min-width:0}
+.nmline .nm{min-width:0;max-width:100%;flex:0 1 auto}
+.shr{display:grid;justify-items:end;gap:3px;padding-right:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.shr b{font-size:15px;font-weight:500}
+.shr span{font-size:13px;color:var(--muted)}
+.shr.over b{color:var(--down)}
+@media (max-width:400px){.row{gap:10px}.shr b{font-size:14px}}
+.row.done .shr{opacity:.45}
+.toast{position:fixed;left:50%;transform:translate(-50%,12px);z-index:20;width:min(560px,calc(100% - 32px));display:grid;grid-template-columns:28px minmax(0,1fr) auto auto;gap:12px;align-items:center;
+  background:var(--raised);color:var(--ink);border-radius:16px;padding:12px 12px 12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.45);opacity:0;transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast .ti{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;background:var(--accent);color:var(--accent-ink)}
+.toast.err .ti{background:var(--down);color:#0B0B0C}
+.toast .tx{display:grid;gap:2px;min-width:0}
+.toast .tx b{font-weight:600;font-size:15px}
+.toast .tx span{font-size:13px;color:var(--muted)}
+.toast button{padding:8px 10px;border-radius:10px;font-size:14px;background:transparent}
+.toast .tu{color:var(--accent)}
+.toast .tc{color:var(--muted);font-size:20px;line-height:1;padding:6px 8px}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+/* tabs */
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;background:var(--surface);border-radius:14px;padding:4px}
+.tabs button{min-width:0;padding:10px 4px;border-radius:11px;background:transparent;color:var(--muted);font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:400px){.tabs button{font-size:12.5px;padding:10px 0;letter-spacing:-.01em}}
+@media (max-width:350px){.tabs button{font-size:12px}}
+.tabs button[aria-selected="true"]{background:var(--raised);color:var(--ink);font-weight:600}
+.sumgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+
+/* dock */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(11,11,12,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dock .in{max-width:960px;margin:0 auto;display:grid;gap:10px}
+.dockrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tot{display:grid;min-width:0}
+.tot small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tot b{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.tot small{font-size:12.5px;color:var(--muted)}
+.tot .of{font-size:13px;font-weight:400;color:var(--muted)}
+button{font:inherit;font-weight:600;border-radius:14px;padding:13px 18px;cursor:pointer;border:0;background:var(--raised);color:var(--ink)}
+button.primary{background:var(--accent);color:var(--accent-ink);white-space:nowrap}
+@media (max-width:400px){.dock button{padding:12px 14px}.tot b{font-size:16px}}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.confirm{font-size:14px;background:var(--surface);border-radius:14px;padding:14px;display:grid;gap:12px}
+.confirm .btns{display:flex;gap:8px;justify-content:flex-end}
+.empty{color:var(--muted);text-align:center;padding:48px 16px}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="ttl"><span class="acc">ИИС-3 · Сбер</span><h1>Пенсия</h1></div>
+    <div class="qbox" id="qbox"></div>
+  </div>
+  <div id="app" class="empty">Загружаю портфель…</div>
+</div>
+<div class="dock" id="dock" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+// ── шлюз на пароле: AES-GCM + PBKDF2 через встроенный WebCrypto ──
+function vaultGate(VAULT, cfg, onOpen){
+  const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+  const b64e=b=>btoa(String.fromCharCode.apply(null,new Uint8Array(b)));
+  const enc=new TextEncoder();
+  const TTL=cfg.ttl||30*24*3600*1000;
+  const saved=()=>{ try{ const s=JSON.parse(localStorage.getItem(cfg.store)||"null"); return (s&&s.exp>Date.now())?s:null; }catch(e){ return null; } };
+  const forget=()=>{ try{ localStorage.removeItem(cfg.store); }catch(e){} };
+  async function keyFromPass(pass){
+    const base=await crypto.subtle.importKey("raw",enc.encode(pass),"PBKDF2",false,["deriveKey"]);
+    return crypto.subtle.deriveKey({name:"PBKDF2",salt:b64d(VAULT.salt),iterations:VAULT.iter,hash:"SHA-256"},
+      base,{name:"AES-GCM",length:256},true,["decrypt"]);
+  }
+  async function openKey(key){
+    const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64d(VAULT.iv)},key,b64d(VAULT.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+  // 1) уже разблокировано на этом устройстве?
+  const s=saved();
+  if(s){
+    (async()=>{ try{
+      const key=await crypto.subtle.importKey("raw",b64d(s.k),{name:"AES-GCM"},true,["decrypt"]);
+      onOpen(await openKey(key));
+    }catch(e){ forget(); show(); } })();
+    return;
+  }
+  show();
+
+  function show(){
+    const ov=document.createElement("div");
+    ov.id="vaultGate";
+    ov.innerHTML=`<style>
+      #vaultGate{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;
+        background:${cfg.bg};color:${cfg.fg};font:15px/1.45 ${cfg.font};overflow:auto}
+      #vaultGate .card{width:100%;max-width:380px;background:${cfg.surface};border:1px solid ${cfg.line};
+        border-radius:16px;padding:24px;display:grid;gap:14px}
+      #vaultGate h2{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}
+      #vaultGate p{margin:0;font-size:13.5px;color:${cfg.muted}}
+      #vaultGate input{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:13px 14px;border-radius:11px;
+        background:${cfg.fieldBg};color:${cfg.fg};border:1px solid ${cfg.line};outline:none}
+      #vaultGate input:focus{border-color:${cfg.accent}}
+      #vaultGate button{font:inherit;font-weight:600;padding:13px 14px;border-radius:11px;border:0;cursor:pointer;
+        background:${cfg.accent};color:${cfg.accentInk}}
+      #vaultGate button:disabled{opacity:.6;cursor:default}
+      #vaultGate .err{color:${cfg.err};font-size:13.5px;min-height:18px}
+      #vaultGate .lg{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:${cfg.muted}}
+      #vaultGate .lg button{all:unset;cursor:pointer;color:${cfg.muted};text-decoration:underline;font-size:12px}
+    </style>
+    <div class="card">
+      <h2>${cfg.title}</h2>
+      <p>${cfg.sub}</p>
+      <input id="vp" type="password" placeholder="Пароль-фраза" autocomplete="current-password" autocapitalize="off" spellcheck="false">
+      <div class="err" id="verr"></div>
+      <button id="vgo">Открыть</button>
+      <div class="lg"><span>${cfg.note||""}</span></div>
+    </div>`;
+    document.body.append(ov);
+    const inp=ov.querySelector("#vp"), btn=ov.querySelector("#vgo"), err=ov.querySelector("#verr");
+    const submit=async()=>{
+      const pass=inp.value.trim(); if(!pass) return;
+      btn.disabled=true; err.textContent="Расшифровываю…";
+      try{
+        const key=await keyFromPass(pass);
+        const data=await openKey(key);
+        const raw=await crypto.subtle.exportKey("raw",key);
+        try{ localStorage.setItem(cfg.store,JSON.stringify({k:b64e(raw),exp:Date.now()+TTL})); }catch(e){}
+        ov.remove(); onOpen(data);
+      }catch(e){
+        err.textContent=cfg.wrong||"Не подходит. Проверь фразу.";
+        btn.disabled=false; inp.select();
+      }
+    };
+    btn.addEventListener("click",submit);
+    inp.addEventListener("keydown",e=>{ if(e.key==="Enter") submit(); });
+    setTimeout(()=>{ if(!window.matchMedia("(hover:hover)").matches) inp.setAttribute("inputmode","text"); },0);
+  }
+}
+
+
+const fmt=(n,d=0)=>Number(n).toLocaleString("ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d});
+const rub=(n,d=0)=>fmt(n,d)+" ₽";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const plural=(n,a,b,c)=>{const m=n%10,h=n%100;return m===1&&h!==11?a:(m>=2&&m<=4&&(h<12||h>14)?b:c)};
+const lotsWord=n=>fmt(n)+" "+plural(n,"лот","лота","лотов");
+const NAMES={SNGSP:"Сургутнефтегаз-п",SBMM:"SBMM"};
+const SECTOR={SBER:"#5BC27A",DOMRF:"#7FA8F5",LKOH:"#F2A24C",TATNP:"#E8C25A",SIBN:"#6FB4F0",ROSN:"#F2C94C",TRNFP:"#9AA7F7",
+  NLMK:"#8EC5D6",CHMF:"#77A6E8",PHOR:"#7DD3B0",X5:"#B7DD6A",IRAO:"#F0907A",LSNGP:"#C5A3F2",SNGSP:"#D9B36C"};
+const MONTHS=["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
+
+const toNum=v=>{const x=parseFloat(String(v??"").replace(/\s/g,"").replace(",","."));return isFinite(x)?x:0};
+function calcPlan(holdings, topup, prices, divs, extra) {
+  const exOwn = (extra && extra.own) || 0, exFree = (extra && extra.free) || 0;
+  const budget = topup + exOwn + exFree, ownFrac = budget > 0 ? (topup + exOwn) / budget : 1;
+  const rows = holdings.map(h => {
+    const price = toNum(prices[h.t]) || h.price;
+    const lotCost = price * h.lot;
+    const div = toNum(divs[h.t]) || 0;
+    const divLots = lotCost > 0 ? Math.floor(div / lotCost) : 0;
+    return { ...h, price, lotCost, div, divLots, divSpend: divLots * lotCost, divRest: div - divLots * lotCost };
+  });
+  const ownTotal = rows.reduce((s, r) => s + r.own, 0);
+  const base = ownTotal + budget;
+  rows.forEach(r => {
+    r.need = (r.w / 100) * base - r.own;
+    r.lots = r.lotCost > 0 ? Math.max(0, Math.floor(r.need / r.lotCost)) : 0;
+  });
+  let spent = rows.reduce((s, r) => s + r.lots * r.lotCost, 0);
+  for (;;) {
+    const rem = budget - spent;
+    let best = null;
+    for (const r of rows) {
+      if (r.lotCost > rem + 1e-9) continue;
+      const gap = r.need - r.lots * r.lotCost;
+      if (gap < r.lotCost / 2) continue; // добираем лот, только если он приближает бумагу к цели
+      if (!best || gap > best.gap) best = { r, gap };
+    }
+    if (!best) break;
+    best.r.lots += 1;
+    spent += best.r.lotCost;
+  }
+  rows.forEach(r => { r.spend = r.lots * r.lotCost; r.ownAdd = r.spend * ownFrac; r.ownAfter = r.own + r.ownAdd; });
+  const ownAfter = rows.reduce((a, r) => a + r.ownAfter, 0);
+  rows.forEach(r => { r.shareAfter = ownAfter > 0 ? (r.ownAfter / ownAfter) * 100 : 0; r.shareNow = ownTotal>0 ? r.own/ownTotal*100 : 0; });
+  const divIn = rows.reduce((s, r) => s + r.div, 0);
+  const divSpent = rows.reduce((s, r) => s + r.divSpend, 0);
+  return { rows, ownTotal, ownAfter, base, budget, ownFrac, spent, topupRest: budget - spent, divIn, divSpent, divRest: divIn - divSpent };
+}
+
+let state=null, months=null, ref=null, mref=null, canWrite=true;
+const draft={topup:null,prices:{},divs:{}};
+let confirming=false, busy=false, msg="", divOpen=false, histAll=false, ckState={};
+const VIEWS=["plan","divs","history","positions"];
+let view=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):"plan";
+let quoting=false, qmsg="", qerr=false;
+const TIERS=[["S","Tier S"],["A","Tier A"],["B","Tier B"],["C","Tier C"]];
+
+function sweepInfo(){
+  const px=toNum(draft.prices.SBMM)||state.sbmm.price, qty=state.sbmm.qty||0, value=qty*px;
+  const limit=state.sbmmLimit??10000, over=value>=limit&&qty>0;
+  const on=over&&(draft.sweep??true);
+  const divPart=on?Math.min(state.sbmm.divCash||0,value):0;
+  return {px,qty,value,limit,over,on,sellQty:on?qty:0,own:on?value-divPart:0,free:divPart};
+}
+function plan(){
+  const topup = draft.topup ?? state.topup ?? 60000;
+  const sw = sweepInfo();
+  return { topup, sw, p: calcPlan(state.holdings, topup, draft.prices, draft.divs, sw.on?{own:sw.own,free:sw.free}:null) };
+}
+function nameOf(t){ const h=state&&state.holdings.find(x=>x.t===t); return h?h.n:(NAMES[t]||t); }
+const LOGOS=new Set(["SBER","DOMRF","LKOH","TATNP","NLMK","PHOR","X5","TRNFP","SIBN","ROSN","CHMF","IRAO","LSNGP","SBMM"]);
+function badge(t,small){ if(LOGOS.has(t)) return `<span class="badge${small?" s":""}" aria-hidden="true"><img src="logos/${t}.png" alt=""></span>`;
+  const n=nameOf(t).replace(/[^A-Za-zА-Яа-яЁё0-9 ]/g," ").trim(); const parts=n.split(/\s+/);
+  const ini=(parts.length>1&&parts[1].length>1?parts[0][0]+parts[1][0]:n.slice(0,2)).toUpperCase();
+  return `<span class="badge${small?" s":""}" style="background:${SECTOR[t]||"#9A9AA2"}" aria-hidden="true">${esc(ini)}</span>`; }
+function priceStamp(){
+  if(!state.priceAt) return "";
+  return new Date(state.priceAt).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Moscow"});
+}
+
+function rowHtml(r){
+  const over=r.shareAfter>r.w+0.25;
+  const val=draft.prices[r.t]??r.price;
+  const done=!!ckState[r.t];
+  return `<div class="row${done?" done":""}" data-t="${r.t}">
+    ${badge(r.t)}
+    <div class="mid">
+      <div class="nm">${esc(r.n)}</div>
+      <div class="sub"><span><input id="p-${r.t}" data-t="${r.t}" class="price" inputmode="decimal" style="width:${String(val).length+0.2}ch" value="${val}" aria-label="Цена ${esc(r.n)}">₽</span>${r.lot>1?`<span>· лот ${r.lot}</span>`:""}</div>
+    </div>
+    <div class="shr${over?" over":""}" title="Доля после покупки из целевой"><b>${fmt(r.shareAfter,1)}%</b><span>из ${fmt(r.w)}%</span></div>
+    <div class="rt">
+      ${r.lots?`<b>${rub(r.spend)}</b><span class="plus">+${lotsWord(r.lots)}</span>`:`<b class="skip">—</b><span class="skip">не покупать</span>`}
+    </div>
+    <label class="ck"><input type="checkbox" class="bought" id="c-${r.t}" data-t="${r.t}" ${done?"checked":""} aria-label="Купил ${esc(r.n)}"></label>
+    ${r.divLots?`<div class="divtag">На дивиденды +${lotsWord(r.divLots)} · ${rub(r.divSpend)}</div>`:(r.div>0?`<div class="divtag">Дивидендов не хватает на лот, ${rub(r.div,2)} уйдут в SBMM</div>`:"")}
+  </div>`;
+}
+
+function monthHtml(m){
+  const [y,mm]=m.month.split("-"); const title=MONTHS[+mm-1]+" "+y;
+  const own=(m.deposit||0)+(m.transfer||0);
+  const sub=[own?`пополнение ${rub(own)}`:"", m.fromSbmm?`из SBMM ${rub(m.fromSbmm)}`:"", m.div?`дивиденды ${rub(m.div)}`:""].filter(Boolean).join(" · ")||"без пополнения";
+  const buys=Object.entries(m.buys||{}).sort((a,b)=>b[1][1]-a[1][1]);
+  const sold=Object.entries(m.sold||{});
+  return `<details class="month"><summary><span class="mn">${title[0].toUpperCase()+title.slice(1)}</span><span class="ms">${sub}</span>
+    <span class="mr"><b class="num">${rub(m.bought)}</b><span>куплено акций</span></span></summary>
+    <div class="mbody">
+      ${buys.length?`<div class="bline bh"><span>Бумага</span><span>Шт.</span><span>Цена</span><span>Сумма</span></div>`:""}
+      ${buys.map(([t,[q,s,pr]])=>`<div class="bline"><span class="nmc">${badge(t,1)}<span class="bn">${esc(nameOf(t))}</span></span><span class="num">${fmt(q)}</span><span class="num">${pr?fmt(pr,pr<10?3:(pr>=1000?0:2)):"—"}</span><span class="num">${fmt(s)}</span></div>`).join("")}
+      ${sold.map(([t,s])=>`<div class="bline"><span class="nmc">${badge(t,1)}<span class="bn">${esc(nameOf(t))}</span></span><span class="q sold">продажа</span><span class="num">+${fmt(s)}</span></div>`).join("")}
+      ${m.transfer?`<div class="tnote">В том числе перевод с другого счёта: ${rub(m.transfer)}</div>`:""}
+    </div></details>`;
+}
+
+function render(){
+  if(!state) return;
+  const app=document.getElementById("app"); app.className="";
+  const {topup,p}=plan();
+  const toSbmm=p.topupRest+p.divRest, hasDivs=p.divIn>0;
+  const sw=plan().sw;
+  const sbmmPx=sw.px, sbmmBuyQ=Math.floor(toSbmm/sbmmPx+1e-9), sbmmNet=sbmmBuyQ-sw.sellQty;
+  const sbmmQ=Math.max(0,sbmmNet), sbmmSum=sbmmQ*sbmmPx, sbmmSellQ=Math.max(0,-sbmmNet);
+  const sbmmDone=!!ckState.SBMM;
+  const sbmmRow=`<section class="sec"><div class="sechead"><h2>Сдача<small>в фонд</small></h2><span class="r">${sbmmQ?rub(sbmmSum):"—"}</span></div>
+    <div class="row${sbmmDone?" done":""}" data-t="SBMM">${badge("SBMM")}
+      <div class="mid"><div class="nm">SBMM</div>
+        <div class="sub"><span><input id="p-SBMM" data-t="SBMM" class="price" inputmode="decimal" style="width:${String(draft.prices.SBMM??state.sbmm.price).length+0.2}ch" value="${draft.prices.SBMM??state.sbmm.price}" aria-label="Цена пая SBMM">₽</span>${sw.on?`<span>· в фонде ${fmt(sw.qty)} шт.</span>`:""}</div></div>
+      <div class="shr"></div>
+      <div class="rt">${sbmmSellQ?`<b>${rub(sbmmSellQ*sbmmPx)}</b><span class="sell">−${fmt(sbmmSellQ)} ${plural(sbmmSellQ,"пай","пая","паёв")}, продать</span>`:sbmmQ?`<b>${rub(sbmmSum)}</b><span class="plus">+${fmt(sbmmQ)} ${plural(sbmmQ,"пай","пая","паёв")}</span>`:`<b class="skip">—</b><span class="skip">меньше пая</span>`}</div>
+      <label class="ck"><input type="checkbox" class="bought" id="c-SBMM" data-t="SBMM" ${sbmmDone?"checked":""} aria-label="Купил SBMM"></label>
+    </div>
+    <div class="limit"><label for="sblimit">Вкладывать SBMM в акции, когда в нём больше</label><span><input id="sblimit" inputmode="numeric" value="${sw.limit}" style="width:${String(sw.limit).length+0.4}ch"> ₽</span></div>
+    </section>`;
+  const sweepCard=sw.over?`<div class="sweep${sw.on?" on":""}"><div><b>В SBMM ${rub(sw.value)}</b><small>больше порога ${rub(sw.limit)}. ${sw.on?`Продать ${fmt(sw.qty)} ${plural(sw.qty,"пай","пая","паёв")} и вложить в акции вместе с пополнением.${sw.free?` Из них ${rub(sw.free)} — сдача от дивидендов, в свои деньги не засчитывается.`:""}`:"Сейчас не вкладывается."}</small></div>
+      <label class="tgl"><input type="checkbox" id="sweep" ${sw.on?"checked":""} aria-label="Вложить SBMM в акции"><span></span></label></div>`:"";
+  const market=p.rows.reduce((s,r)=>s+r.qty*r.price,0)+state.sbmm.qty*state.sbmm.price+(state.cash||0);
+
+  const groups=TIERS.map(([k,label])=>{
+    const rs=p.rows.filter(r=>r.tier===k); if(!rs.length) return "";
+    const w=rs.reduce((x,r)=>x+r.w,0), sum=rs.reduce((x,r)=>x+r.spend,0);
+    return `<section class="sec"><div class="sechead"><h2>${label}<small>${fmt(w)}%</small></h2><span class="r">${sum?rub(sum):"—"}</span></div>
+      ${rs.map(rowHtml).join("")}</section>`;
+  }).join("");
+
+  const divRows=p.rows.map(r=>`<div class="drow">${badge(r.t)}<div class="mid"><label class="nm" for="d-${r.t}">${esc(r.n)}</label>
+      <div class="sub">${r.div>0?(r.divLots?`<span class="plus">+${lotsWord(r.divLots)} · ${rub(r.divSpend)}</span>${r.divRest>0.005?` · в SBMM ${rub(r.divRest,2)}`:""}`:`<span>не хватает на лот</span><span>(${rub(r.lotCost)}), всё в SBMM</span>`):`<span>лот ${rub(r.lotCost)}</span><span>· получено ${rub(r.divs||0)}</span>`}</div></div>
+      <input id="d-${r.t}" data-t="${r.t}" class="div" inputmode="decimal" placeholder="0 ₽" value="${draft.divs[r.t]??""}"></div>`).join("");
+  const payouts=[]; (months&&months.items||[]).forEach(m=>Object.entries(m.divBy||{}).forEach(([t,v])=>payouts.push({month:m.month,t,v})));
+  payouts.sort((a,b)=>a.month<b.month?1:a.month>b.month?-1:b.v-a.v);
+  const pos=p.rows.map(r=>{const mv=r.qty*r.price;return `<tr><td><span class="nmc">${badge(r.t,1)}${esc(r.n)}</span></td><td>${fmt(r.qty)}</td><td>${rub(r.own)}</td><td>${fmt(r.shareNow,2)}%</td><td>${rub(mv)}</td><td>${fmt(mv/market*100,2)}%</td><td>${rub(r.divs||0)}</td></tr>`}).join("");
+
+  const ms=(months&&months.items||[]).slice().sort((a,b)=>a.month<b.month?1:-1);
+
+  const tot=ms.reduce((a,m)=>({dep:a.dep+(m.deposit||0)+(m.transfer||0),div:a.div+(m.div||0),buy:a.buy+(m.bought||0)}),{dep:0,div:0,buy:0});
+  const tabs=`<div class="tabs" role="tablist">${[["plan","Покупка"],["divs","Дивиденды"],["history","История"],["positions","Позиции"]].map(([k,l])=>`<button role="tab" data-v="${k}" aria-selected="${view===k}">${l}</button>`).join("")}</div>`;
+  const planView=`  <div class="hero">
+    <label for="topup">Пополнение</label>
+    <div class="amount"><input id="topup" inputmode="numeric" style="width:${String(topup).length+0.4}ch" value="${topup}"><span class="cur">₽</span></div>
+    <div class="heroline">Купить акций на ${rub(p.spent)} <span class="muted">· ${sw.on?`из них ${rub(sw.value)} из SBMM`:`в SBMM ${rub(toSbmm)}`}</span></div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><small>Портфель</small><b>${fmt(market/1e6,2)} млн ₽</b></div>
+    <div class="tile"><small>Своих денег</small><b>${fmt(p.ownTotal/1e6,2)} млн ₽</b></div>
+  </div>
+
+  ${sweepCard}
+  ${hasDivs?`<button class="divnote" data-goto="divs">Дивиденды ${rub(p.divIn,2)} → акций на ${rub(p.divSpent)}<span>Изменить</span></button>`:""}
+
+  ${groups}
+  ${sbmmRow}`;
+  const histView=`<div class="sumgrid">
+      <div class="tile"><small>Внесено, ₽</small><b>${fmt(tot.dep/1e6,2)} млн</b></div>
+      <div class="tile"><small>Дивиденды, ₽</small><b>${fmt(tot.div)}</b></div>
+      <div class="tile"><small>Куплено, ₽</small><b>${fmt(tot.buy/1e6,2)} млн</b></div></div>
+    <div class="card" style="padding-block:4px">${ms.length?`<div>${ms.map(monthHtml).join("")}</div>`:`<div class="muted" style="padding:12px 0">История появится после первой записи покупок.</div>`}</div>`;
+  const sbmmV=state.sbmm.qty*state.sbmm.price;
+  const k=v=>v>=1e6?fmt(v/1e6,2)+" млн":v>=1e5?fmt(v/1e3)+" тыс":fmt(v/1e3,1)+" тыс";
+  const posMobile=`<div class="card">
+    ${p.rows.map(r=>{const mv=r.qty*r.price;return `<div class="prow">${badge(r.t)}<div class="mid"><div class="nm">${esc(r.n)}</div><div class="sub"><span>${fmt(r.qty)} шт.</span><span>· своих ${k(r.own)}</span><span>· див. ${k(r.divs||0)}</span></div></div>
+      <div class="rt"><b>${k(mv)}</b><span>${fmt(r.shareNow,1)}% · ${fmt(mv/market*100,1)}%</span></div></div>`}).join("")}
+    <div class="prow">${badge("SBMM")}<div class="mid"><div class="nm">SBMM</div><div class="sub"><span>${fmt(state.sbmm.qty)} шт.</span><span>· фонд денежного рынка</span></div></div>
+      <div class="rt"><b>${k(sbmmV)}</b><span>${fmt(sbmmV/market*100,1)}%</span></div></div>
+    <div class="cnote">Справа рыночная стоимость в рублях и доля: от своих денег · от рынка.</div></div>`;
+  const posView=window.innerWidth<640?posMobile:`  <div class="card">
+    <div class="tbl"><table><thead><tr><th>Бумага</th><th>Шт.</th><th>Своих денег</th><th>Доля своих</th><th>Стоимость</th><th>Доля по рынку</th><th>Дивиденды</th></tr></thead>
+    <tbody>${pos}<tr><td><span class="nmc">${badge("SBMM",1)}SBMM</span></td><td>${fmt(state.sbmm.qty)}</td><td></td><td></td><td>${rub(state.sbmm.qty*state.sbmm.price)}</td><td>${fmt(state.sbmm.qty*state.sbmm.price/market*100,2)}%</td><td></td></tr></tbody></table></div>
+  </div>`;
+  // статистика выплат
+  const allM=(months&&months.items||[]).map(m=>m.month).sort();
+  const span=[]; if(allM.length){let [y,m]=allM[0].split("-").map(Number);const [ly,lm]=allM[allM.length-1].split("-").map(Number);
+    while(y<ly||(y===ly&&m<=lm)){span.push(`${y}-${String(m).padStart(2,"0")}`);m++;if(m>12){m=1;y++;}}}
+  const byMonth=Object.fromEntries(span.map(k=>[k,0])); payouts.forEach(x=>{byMonth[x.month]=(byMonth[x.month]||0)+x.v;});
+  const last12=span.slice(-12), sum12=last12.reduce((a,k)=>a+(byMonth[k]||0),0);
+  const divTotal=payouts.reduce((a,x)=>a+x.v,0);
+  const byCo={}; payouts.forEach(x=>byCo[x.t]=(byCo[x.t]||0)+x.v);
+  const coList=Object.entries(byCo).sort((a,b)=>b[1]-a[1]);
+  const maxCo=coList.length?coList[0][1]:1, maxM=Math.max(1,...Object.values(byMonth));
+  const payers=coList.length, silent=p.rows.filter(r=>!byCo[r.t]).map(r=>r.n);
+  const yld=p.ownTotal>0?sum12/p.ownTotal*100:0;
+  const statsHtml=payouts.length?`<section class="sec"><div class="sechead"><h2>Статистика выплат</h2><span class="r">${span.length?MONTHS[+span[0].slice(5)-1].slice(0,3)+" "+span[0].slice(0,4)+" – сейчас":""}</span></div>
+    <div class="sumgrid">
+      <div class="tile"><small>За 12 месяцев</small><b>${rub(sum12)}</b></div>
+      <div class="tile"><small>В месяц, в среднем</small><b>${rub(sum12/Math.max(1,last12.length))}</b></div>
+      <div class="tile"><small>Див. доходность</small><b>${fmt(yld,2)}%</b></div>
+    </div>
+    <div class="card"><div class="ctitle">По месяцам</div>
+      <div class="mbars">${span.map(k=>{const v=byMonth[k]||0;return `<div class="mb" title="${MONTHS[+k.slice(5)-1]} ${k.slice(0,4)}: ${rub(v)}"><span class="mv">${v?fmt(v/1000,1):""}</span><span class="bar" style="height:${Math.max(v?4:2,v/maxM*104)}px;${v?"":"background:var(--line)"}"></span><span class="ml">${MONTHS[+k.slice(5)-1].slice(0,3)}</span></div>`}).join("")}</div>
+      <div class="cnote">тыс. ₽ · ${payouts.length} ${plural(payouts.length,"выплата","выплаты","выплат")} от ${payers} из ${p.rows.length} компаний</div></div>
+    <div class="card"><div class="ctitle">По компаниям</div>
+      ${coList.map(([t,v])=>`<div class="cobar"><span class="nmc">${badge(t,1)}${esc(nameOf(t))}</span><span class="num">${rub(v)}</span><span class="track"><span style="width:${v/maxCo*100}%"></span></span><span class="pct">${fmt(v/divTotal*100,0)}%</span></div>`).join("")}
+      ${silent.length?`<div class="cnote">Ещё не платили: ${silent.map(esc).join(", ")}</div>`:""}</div>
+  </section>`:"";
+  const divView=`    <div class="card" style="padding-block:4px">${divRows}</div>
+    ${statsHtml}
+    <section class="sec"><div class="sechead"><h2>Полученные выплаты</h2><span class="r">${rub(payouts.reduce((a,x)=>a+x.v,0))}</span></div>
+    <div class="card">${payouts.length?`<div class="bline c3 bh"><span>Бумага</span><span>Месяц</span><span>Сумма</span></div>`+payouts.map(x=>{const [y,mm]=x.month.split("-");return `<div class="bline c3"><span class="nmc">${badge(x.t,1)}<span class="bn">${esc(nameOf(x.t))}</span></span><span class="q">${MONTHS[+mm-1].slice(0,3)} ${y}</span><span class="num">${fmt(x.v,2)}</span></div>`}).join(""):`<div class="muted" style="padding:12px 0">Выплат пока нет.</div>`}</div></section>`;
+  app.innerHTML=tabs+(view==="plan"?planView:view==="divs"?divView:view==="history"?histView:posView);
+  document.getElementById("qbox").innerHTML=`<button class="qbtn" id="refresh" ${quoting?"disabled":""}>${quoting?"Обновляю…":"Обновить цены"}</button>
+    <span class="qt">${state.priceAt?"MOEX, "+priceStamp()+" МСК":"Цены ещё не обновлялись"}</span>
+    ${qmsg?`<span class="qline ${qerr?"err":""}">${esc(qmsg)}</span>`:""}`;
+  const dock=document.getElementById("dock");
+  const onDivs=view==="divs";
+  dock.hidden=!(view==="plan"||(onDivs&&(hasDivs||state.undo)));
+  const divRowsN=p.rows.filter(r=>r.divLots).length;
+  const confirmText=onDivs
+    ? `Запишу покупки на дивиденды по ценам со страницы: акций на ${rub(p.divSpent)}, в SBMM ${rub(p.divRest,2)}. Пополнение это не затронет.`
+    : `Запишу покупки по ценам со страницы: акций на ${rub(p.spent)}${hasDivs?` и ${rub(p.divSpent)} на дивиденды`:""}, в SBMM ${rub(toSbmm,2)}. ${sw.on?` Продам ${fmt(sw.qty)} паёв SBMM на ${rub(sw.value)} и вложу их.`:""} Позиции и история обновятся.`;
+  const sbItem=(sbmmQ||sbmmSellQ)?[{t:"SBMM",spend:sbmmSum,divSpend:0}]:[];
+  const need=[...p.rows.filter(r=>r.lots||r.divLots),...sbItem], picked=need.filter(r=>ckState[r.t]);
+  const pickedSum=picked.reduce((a,r)=>a+r.spend+r.divSpend,0), allSum=p.spent+p.divSpent+sbmmSum;
+  const totB=onDivs?rub(p.divSpent):(picked.length?rub(pickedSum):rub(allSum));
+  const totS=msg?esc(msg):onDivs
+    ? (hasDivs?`${divRowsN} ${plural(divRowsN,"бумага","бумаги","бумаг")} · в SBMM ${rub(p.divRest)}`:"")
+    : (picked.length?`${picked.length} из ${need.length} · осталось ${rub(allSum-pickedSum)}`:need.length+" бумаг к покупке");
+  const recLabel=onDivs?"Записать дивиденды":"Записать покупки";
+  dock.innerHTML=`<div class="in">
+    ${confirming?`<div class="confirm"><span>${confirmText}</span>
+      <div class="btns"><button id="cancel">Отмена</button><button class="primary" id="ok">Подтвердить</button></div></div>`:""}
+    <div class="dockrow">
+      <div class="tot"><b>${totB}</b><small>${totS}</small></div>
+      <div style="display:flex;gap:8px">${state.undo&&!confirming?`<button id="undo" ${(!canWrite||busy)?"disabled":""}>Отменить</button>`:""}${confirming||(onDivs&&!hasDivs)?"":`<button class="primary" id="rec" ${(!canWrite||busy)?"disabled":""}>${recLabel}</button>`}</div>
+    </div></div>`;
+  bind();
+}
+
+function keepFocus(fn){
+  const a=document.activeElement,id=a&&a.id,pos=a&&a.selectionStart;
+  fn();
+  if(id){const el=document.getElementById(id);if(el&&el.tagName==="INPUT"){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
+}
+const num=v=>{const x=parseFloat(String(v).replace(/\s/g,"").replace(",","."));return isFinite(x)?x:0};
+
+function bind(){
+  const t=document.getElementById("topup");
+  if(t) t.addEventListener("input",()=>{draft.topup=num(t.value);keepFocus(render)});
+  document.querySelectorAll("input.price").forEach(i=>i.addEventListener("input",()=>{
+    if(num(i.value)>0) draft.prices[i.dataset.t]=i.value; else delete draft.prices[i.dataset.t]; keepFocus(render)}));
+  document.querySelectorAll("input.div").forEach(i=>i.addEventListener("input",()=>{
+    if(i.value.trim()) draft.divs[i.dataset.t]=i.value; else delete draft.divs[i.dataset.t]; keepFocus(render)}));
+  const on=(id,f)=>{const el=document.getElementById(id);if(el)el.onclick=f};
+  document.querySelectorAll(".row[data-t]").forEach(row=>row.addEventListener("click",e=>{
+    if(e.target.closest("input,label,button")) return;
+    const c=document.getElementById("c-"+row.dataset.t); if(!c) return;
+    c.checked=!c.checked; c.dispatchEvent(new Event("change"));
+  }));
+  document.querySelectorAll("input.bought").forEach(c=>c.addEventListener("change",async()=>{
+    ckState={...ckState,[c.dataset.t]:c.checked};
+    msg=""; keepFocus(render);
+    try{ await ref.update({checked:ckState}); }catch(e){}
+  }));
+  const swc=document.getElementById("sweep"); if(swc) swc.addEventListener("change",()=>{draft.sweep=swc.checked;render();});
+  const lim=document.getElementById("sblimit"); if(lim){ lim.addEventListener("click",e=>e.stopPropagation()); lim.addEventListener("change",async()=>{const v=Math.max(0,Math.round(toNum(lim.value)));try{await ref.update({sbmmLimit:v});}catch(e){} }); }
+  document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>{view=b.dataset.goto;try{history.replaceState(null,"","#"+view)}catch(e){}render();window.scrollTo(0,0)});
+  document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{view=b.dataset.v;confirming=false;try{history.replaceState(null,"","#"+view)}catch(e){}render();window.scrollTo(0,0)});
+  on("refresh",()=>refreshQuotes(true));
+  on("rec",()=>{confirming=true;msg="";render()});
+  on("cancel",()=>{confirming=false;render()});
+  on("ok",()=>record(view==="divs")); on("undo",undo);
+}
+
+function merge(items,key,patch){
+  const list=JSON.parse(JSON.stringify(items||[]));
+  let m=list.find(x=>x.month===key);
+  if(!m){m={month:key,deposit:0,transfer:0,div:0,divBy:{},bought:0,buys:{},sold:{}};list.push(m);}
+  m.deposit=+((m.deposit||0)+patch.deposit).toFixed(2);
+  m.div=+((m.div||0)+patch.div).toFixed(2);
+  if(patch.fromSbmm) m.fromSbmm=+((m.fromSbmm||0)+patch.fromSbmm).toFixed(2);
+  m.bought=+((m.bought||0)+patch.bought).toFixed(2);
+  m.divBy=m.divBy||{}; for(const [t,v] of Object.entries(patch.divBy)) m.divBy[t]=+((m.divBy[t]||0)+v).toFixed(2);
+  m.buys=m.buys||{}; for(const [t,[q,s,pr]] of Object.entries(patch.buys)){const o=m.buys[t]||[0,0,0];const nq=o[0]+q;m.buys[t]=[nq,+(o[1]+s).toFixed(2),+(((o[0]*(o[2]||pr))+q*pr)/nq).toFixed(4)];}
+  return list;
+}
+
+async function record(onlyDivs){
+  const {topup,p,sw}=onlyDivs?{topup:0,p:calcPlan(state.holdings,0,draft.prices,draft.divs),sw:{on:false,sellQty:0,own:0,free:0,value:0}}:plan();
+  busy=true;render();
+  const strip=s=>{const {undo,...rest}=s;return JSON.parse(JSON.stringify(rest))};
+  const prev=strip(state); prev.months=JSON.parse(JSON.stringify(months&&months.items||[]));
+  const toSbmm=p.topupRest+p.divRest;
+  const next=strip(state);
+  next.holdings=state.holdings.map(h=>{const r=p.rows.find(x=>x.t===h.t);
+    return {...h,price:r.price,qty:h.qty+(r.lots+r.divLots)*h.lot,own:+(h.own+r.ownAdd).toFixed(2),
+      invested:+((h.invested||0)+r.spend+r.divSpend).toFixed(2),divs:+((h.divs||0)+r.div).toFixed(2)}});
+  const sbPx=toNum(draft.prices.SBMM)||state.sbmm.price;
+  next.sbmm={...state.sbmm,price:sbPx,qty:state.sbmm.qty-sw.sellQty+Math.floor(toSbmm/sbPx+1e-9),
+    divCash:+(Math.max(0,(state.sbmm.divCash||0)-sw.free)+p.divRest).toFixed(2)};
+  next.topup=onlyDivs?state.topup:topup;
+  next.updatedAt=new Date().toISOString().slice(0,10);
+  next.undo=prev; if(!onlyDivs) next.checked={};
+  const key=next.updatedAt.slice(0,7);
+  const buys={}; p.rows.forEach(r=>{const q=(r.lots+r.divLots)*r.lot; if(q) buys[r.t]=[q,+(r.spend+r.divSpend).toFixed(2),r.price];});
+  const divBy={}; p.rows.forEach(r=>{if(r.div) divBy[r.t]=r.div;});
+  const items=merge(months&&months.items,key,{deposit:topup,fromSbmm:sw.on?+sw.value.toFixed(2):0,div:p.divIn,bought:p.spent+p.divSpent,divBy,buys});
+  try{
+    await mref.set({items});
+    await ref.set(next);
+    msg=""; draft.divs={}; divOpen=false; if(!onlyDivs){draft.topup=null; draft.prices={};}
+    const nPapers=p.rows.filter(r=>r.lots||r.divLots).length;
+    toast(onlyDivs?"Дивиденды записаны":"Покупки записаны",
+      `${nPapers} ${plural(nPapers,"бумага","бумаги","бумаг")} на ${rub(p.spent+p.divSpent)} · в SBMM ${rub(toSbmm)}. Позиции и история обновлены.`,"ok",true);
+  }catch(e){ const no=e&&e.code==="invalid_argument"; if(no) canWrite=false; msg="";
+    toast("Не записано", no?"Нет прав на запись в эту страницу.":"Не удалось сохранить. Проверь связь и попробуй ещё раз.","err"); }
+  busy=false;confirming=false;render();
+}
+async function undo(){
+  if(!state.undo) return;
+  busy=true;render();
+  const {months:prevMonths,...prevState}=state.undo;
+  try{
+    if(prevMonths) await mref.set({items:prevMonths});
+    await ref.set(prevState);
+    msg=""; toast("Запись отменена","Позиции и история вернулись к прошлому состоянию.","ok");
+  }catch(e){ msg=""; toast("Не отменено","Не удалось отменить запись. Попробуй ещё раз.","err"); }
+  busy=false;render();
+}
+
+/* ---------- котировки MOEX напрямую с iss.moex.com ---------- */
+const MOEX="https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities.json?securities="+
+  "SBER,LKOH,TATNP,DOMRF,PHOR,NLMK,SIBN,ROSN,CHMF,TRNFP,X5,IRAO,LSNGP&iss.only=marketdata&marketdata.columns=SECID,LAST,LCURRENTPRICE,UPDATETIME&iss.meta=off";
+let booted=false;
+function setQ(text,err){qmsg=text||"";qerr=!!err;keepFocus(render);}
+async function initQuotes(){ refreshQuotes(); }
+async function refreshQuotes(manual){
+  if(quoting||!state) return;
+  quoting=true;setQ("");
+  try{
+    const res=await fetch(MOEX,{cache:"no-store"});
+    if(!res.ok) throw {code:"net"};
+    const j=await res.json();
+    const md=j.marketdata; const px={};
+    md.data.forEach(row=>{const o={};md.columns.forEach((c,k)=>o[c]=row[k]);const v=o.LAST||o.LCURRENTPRICE;if(v>0)px[o.SECID]=v;});
+    const n=Object.keys(px).length; if(!n) throw {code:"empty"};
+    const holdings=JSON.parse(JSON.stringify(state.holdings)).map(h=>px[h.t]?{...h,price:px[h.t]}:h);
+    await ref.update({holdings,priceAt:new Date().toISOString()});
+    draft.prices={};
+    quoting=false; setQ(n<13?`Обновлено ${n} из 13 бумаг, у остальных старые цены.`:"");
+    if(manual) toast("Цены обновлены",`Котировки Мосбиржи на ${priceStamp()} МСК.`,"ok");
+  }catch(e){
+    quoting=false;
+    setQ(e&&e.code==="empty"?"Биржа ответила без цен. Возможно, торги ещё не начались.":"Не получилось получить котировки. Попробуй ещё раз.",true);
+  }
+}
+
+let rzT;window.addEventListener("resize",()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(state&&view==="positions")render()},150)});
+let toastT=null;
+function toast(title,text,kind,withUndo){
+  const el=document.getElementById("toast"); if(!el) return;
+  const place=()=>{const dock=document.getElementById("dock");const vis=dock&&!dock.hidden;
+    el.style.bottom=`calc(${(vis?dock.offsetHeight:0)+12}px + ${vis?"0px":"env(safe-area-inset-bottom, 0px)"})`;};
+  setTimeout(place,0); setTimeout(place,250);
+  el.className="toast "+(kind||"ok");
+  el.innerHTML=`<span class="ti" aria-hidden="true">${kind==="err"?"!":"✓"}</span><div class="tx"><b>${esc(title)}</b>${text?`<span>${esc(text)}</span>`:""}</div>${withUndo?`<button class="tu" id="toastUndo">Отменить</button>`:""}<button class="tc" id="toastClose" aria-label="Закрыть">×</button>`;
+  el.hidden=false; requestAnimationFrame(()=>el.classList.add("show"));
+  const u=document.getElementById("toastUndo"); if(u) u.onclick=()=>{hideToast();undo();};
+  document.getElementById("toastClose").onclick=hideToast;
+  clearTimeout(toastT); toastT=setTimeout(hideToast,kind==="err"?9000:6000);
+}
+function hideToast(){const el=document.getElementById("toast"); if(!el) return; el.classList.remove("show"); clearTimeout(toastT); toastT=setTimeout(()=>{el.hidden=true},200);}
+// Зашифрованный снимок портфеля: открывается паролем, правки хранятся в браузере
+const VAULT={"v":1,"iter":600000,"salt":"JUH+WfHWeZlFlaxjKK0G/A==","iv":"ThJf+5GZZdaTUSLB","ct":"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"};
+const LSKEY="iis3-docs-v1";
+const deep=o=>JSON.parse(JSON.stringify(o));
+let store=null, SEED=null;
+try{ store=JSON.parse(localStorage.getItem(LSKEY)); }catch(e){ store=null; }
+const subs={};
+function persist(){ try{ localStorage.setItem(LSKEY, JSON.stringify(store)); }catch(e){} }
+function emit(path){ const s={exists:!!store[path], data:()=>deep(store[path])}; (subs[path]||[]).forEach(cb=>cb(s)); }
+const db={ doc:path=>({
+  onSnapshot(cb){ (subs[path]=subs[path]||[]).push(cb); cb({exists:!!store[path], data:()=>deep(store[path])}); },
+  async get(){ return {exists:!!store[path], data:()=>deep(store[path])}; },
+  async set(obj){ store[path]=deep(obj); persist(); emit(path); },
+  async update(patch){ store[path]=Object.assign({}, store[path], deep(patch)); persist(); emit(path); }
+})};
+vaultGate(VAULT,{store:"iis3-unlock-v1",title:"Портфель закрыт",sub:"Введи пароль-фразу, чтобы открыть табло ИИС-3.",
+  note:"Запоминается на 30 дней на этом устройстве",bg:"#0B0B0C",surface:"#18181B",line:"#2A2A2F",fg:"#F4F4F5",
+  muted:"#8C8C94",accent:"#6E9BFF",accentInk:"#0A1023",err:"#F0605A",fieldBg:"#222226",font:"'Golos Text',system-ui,sans-serif"},
+  data=>{
+    SEED=data;
+    if(!store) store=deep(SEED);
+    ref=db.doc("portfolio/state"); mref=db.doc("portfolio/months");
+    mref.onSnapshot(s=>{months=s.exists?s.data():{items:[]}; if(state) keepFocus(render);},()=>{});
+    ref.onSnapshot(s=>{
+      if(!s.exists){document.getElementById("app").textContent="Портфель ещё не загружен.";return;}
+      state=s.data(); ckState={...(state.checked||{})}; keepFocus(render);
+      if(!booted){booted=true;initQuotes();}
+    },()=>{msg="Связь с хранилищем потеряна, обнови страницу";state&&render();});
+  });
+</script>
+
+</body></html>
