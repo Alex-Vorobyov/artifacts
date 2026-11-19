@@ -9,3 +9,12 @@ HTML-артефакты, собранные Hermes. Данные внутри з
 Инструменты: `tools/vault.mjs` (шифрование/расшифровка/смена пароля).
   node tools/vault.mjs encrypt tools/seed_x.json tools/vault_x.json
   node tools/vault.mjs decrypt tools/vault_x.json
+
+## Смена пароль-фразы
+
+Сиды лежат вне репозитория (`SEEDS`, по умолчанию `~/.hermes/cache/scratch/seeds`):
+
+    SEEDS=/путь/к/сидам node tools/rotate.mjs
+
+Скроет новую фразу дважды, перешифрует оба артефакта и перепишет блоки `VAULT`
+в HTML. Дальше — commit и push. Старая фраза перестаёт работать сразу.
