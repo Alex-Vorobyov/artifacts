@@ -1,0 +1,35 @@
+[Unit]
+Description=Board sync endpoint (отметки табло артефактов)
+Documentation=https://github.com/Alex-Vorobyov/artifacts/tree/main/tools/board-sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=board-sync
+StateDirectoryMode=0700
+LoadCredential=key:/etc/board-sync/key
+Environment=STATE_DIR=/var/lib/board-sync
+Environment=PORT=8791
+Environment=HOST=127.0.0.1
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /opt/board-sync/server.py
+Restart=always
+RestartSec=2
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target
