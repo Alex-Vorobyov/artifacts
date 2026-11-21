@@ -29,12 +29,12 @@ POST /board-sync  → {"marks":{…}} → сервер сливает и воз�
 | systemd | `/etc/systemd/system/board-sync.service`, `DynamicUser`, `StateDirectory=board-sync` |
 | Ключ | `/etc/board-sync/key` (600, читается через `LoadCredential`) |
 | Состояние | `/var/lib/board-sync/state.json` + снимки каждые 20 ревизий в `history/` |
-| Публикация | nginx `location = /board-sync` → `127.0.0.1:8791`, дальше Cloudflare |
+| Публикация | nginx `location ^~ /board-sync` → `127.0.0.1:8791`, дальше Cloudflare |
 
 Правка nginx не в git (так устроен прод). Блок, который нужно вернуть при переезде:
 
 ```nginx
-location = /board-sync {
+location ^~ /board-sync {
     proxy_pass http://127.0.0.1:8791;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
